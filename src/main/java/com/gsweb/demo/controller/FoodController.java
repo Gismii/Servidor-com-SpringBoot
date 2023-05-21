@@ -17,9 +17,17 @@ public class FoodController {
     private FoodRepository repository;
 
 
-    //Salva varios objetos!
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
+    public void saveFood(@RequestBody FoodRequestDTO data) {
+        Food food = new Food(data);
+        repository.save(food);
+    }
+
+
+    //Salva varios objetos!
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/lista")
     public void saveFoods(@RequestBody List<FoodRequestDTO> dataList) {
         List<Food> foodList = dataList.stream()
                 .map(Food::new)
