@@ -3,13 +3,16 @@ package com.gsweb.demo.food;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Table(name = "food")
 @Entity(name = "food")
 @Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+
 public class Food {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,5 +30,7 @@ public class Food {
 
 
     }
+
+
 
 }

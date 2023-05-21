@@ -1,10 +1,9 @@
 package com.gsweb.demo.controller;
 
-import com.gsweb.demo.food.Food;
-import com.gsweb.demo.food.FoodRepository;
-import com.gsweb.demo.food.FoodRequestDTO;
-import com.gsweb.demo.food.FoodResponseDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gsweb.demo.food.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,21 +12,25 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("food")
 public class FoodController {
 
+    ResourceNotFoundException resourceNotFoundException;
     @Autowired
     private FoodRepository repository;
 
+
+    //Salva varios objetos!
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveFood(@RequestBody FoodRequestDTO data) {
-        Food foodData = new Food( data);
-        repository.save(foodData);
+    public void saveFoods(@RequestBody List<FoodRequestDTO> dataList) {
+        List<Food> foodList = dataList.stream()
+                .map(Food::new)
+                .collect(Collectors.toList());
 
-        return;
-
+        repository.saveAll(foodList);
     }
 
+    //Lista todos os objetos
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping()
+    @GetMapping("/food")
     public List<FoodResponseDTO> getAll() {
 
         List<FoodResponseDTO> foodList = repository.findAll().stream().map(FoodResponseDTO::new).toList();
@@ -35,6 +38,7 @@ public class FoodController {
         return foodList;
     }
 
+    //busca por Id!
     @GetMapping("/food/{id}")
     public List<FoodResponseDTO> getById(@PathVariable Long id) {
 
@@ -46,10 +50,46 @@ public class FoodController {
                 .map(FoodResponseDTO::new)
                 .collect(Collectors.toList());
 
+        if(filteredList.isEmpty()){
+
+            throw new RuntimeException("There is no id 35. " + id);
+
+        }
 
 
         return filteredList;
+
+    }
+
+    //deleta por Id!
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @DeleteMapping("/food/{id}")
+    public void deleteFoodById(@PathVariable Long id) {
+        Food food = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Food not found with ID: " + id));
+        repository.delete(food);
+
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PutMapping("/food/{id}")
+    public void updateFoodById(@PathVariable Long id, @RequestBody FoodRequestDTO data) {
+        Food food = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Food not found with ID: " + id));
+
+        // Atualiza os dados do objeto Food com base nos valores fornecidos no corpo da requisição
+        food.setTitle(data.title());
+        food.setDescription(data.description());
+        food.setImage(data.image());
+        food.setPrice(data.price());
+
+        repository.save(food);
     }
 
 
+
+
+
 }
+
+
