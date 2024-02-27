@@ -1,9 +1,7 @@
 package com.gsweb.demo;
 
 
-import com.gsweb.demo.food.Food;
-import com.gsweb.demo.food.FoodRequestDTO;
-import com.gsweb.demo.food.FoodResponseDTO;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
