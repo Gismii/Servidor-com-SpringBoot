@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class FoodController {
 
     ResourceNotFoundException resourceNotFoundException;
+
     @Autowired
     private FoodRepository repository;
 
@@ -58,11 +60,17 @@ public class FoodController {
                 .map(FoodResponseDTO::new)
                 .collect(Collectors.toList());
 
-        if(filteredList.isEmpty()){
+        try {
+            if (filteredList.isEmpty()) {
+                throw new RuntimeException("There is no id: " + id);
+            }
+        } catch (RuntimeException e) {
 
-            throw new RuntimeException("There is no id 35. " + id);
-
+            // Aqui você pode fazer o que quiser com a exceção,
+            // como imprimir a mensagem ou lidar com ela de forma diferente.
+            System.out.println("Exceção capturada: " + e.getMessage());
         }
+
 
 
         return filteredList;
@@ -76,6 +84,14 @@ public class FoodController {
         Food food = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Food not found with ID: " + id));
         repository.delete(food);
+
+    }
+    @Transactional
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @DeleteMapping("/food/all")
+    public void deleteAllfood() {
+
+        repository.deleteAll();
 
     }
 
